@@ -30,8 +30,14 @@ import android.widget.Toast;
 
 import com.diary.ishita.mydiary.data.DiaryContract.DiaryEntry;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 
 public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
@@ -39,7 +45,10 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     private static final int RESULT_TITLE_SPEECH = 100;
     private static final int RESULT_DESCRIPTION_TEXT = 101;
     private static ImageView image_view_detail_activity;
-    private static EditText title_text_view;
+    private static EditText weather_text_view;
+    private static EditText mood_text_view;
+    private static EditText key1_text_view;
+    private static TextView title_text_view;
     private static TextView date_text_view;
     private static EditText description_text_view;
     private static Uri CURRENT_DIARY_URI;
@@ -65,12 +74,14 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         }
 
         image_view_detail_activity= (ImageView)findViewById(R.id.detail_activity_image_view);
-        title_text_view=(EditText) findViewById(R.id.title_note);
+        weather_text_view=(EditText) findViewById(R.id.weather_note);
+        mood_text_view=(EditText) findViewById(R.id.mood_note);
+        key1_text_view=(EditText) findViewById(R.id.key_note_1);
         date_text_view= (TextView)findViewById(R.id.date_detail_activity);
         description_text_view=(EditText)findViewById(R.id.description_detail_Activity);
         date_range =(Button)findViewById(R.id.date_selector);
-        title_mic_button=(Button)findViewById(R.id.title_mic_button);
-        description_mic_button=(Button)findViewById(R.id.description_mic_button);
+//        title_mic_button=(Button)findViewById(R.id.title_mic_button);
+//        description_mic_button=(Button)findViewById(R.id.description_mic_button);
         myCalendar = Calendar.getInstance();
 
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
@@ -106,56 +117,78 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         });
         image_view_detail_activity.setOnTouchListener(mTouchListener);
         date_range.setOnTouchListener(mTouchListener);
-        title_text_view.setOnTouchListener(mTouchListener);
+
+        weather_text_view.setOnTouchListener(mTouchListener);
+
         description_text_view.setOnTouchListener(mTouchListener);
-        title_mic_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, new String[]{"hin-IND"});
-                try{
-                    startActivityForResult(intent,RESULT_TITLE_SPEECH);
-                }catch (ActivityNotFoundException a){
-                    Toast toast = Toast.makeText(getApplicationContext(),"Your device dosen't support speech recognisation!",Toast.LENGTH_SHORT);
-                    toast.show();
-                }
-            }
-        });
-        description_mic_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent= new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,new String[]{"en"});
-                try{
-                    startActivityForResult(intent,RESULT_DESCRIPTION_TEXT);
-                }catch (ActivityNotFoundException a){
-                    Toast toast = Toast.makeText(getApplicationContext(),"Your device dosen't support speech recognisation!",Toast.LENGTH_SHORT);
-                    toast.show();
-                }
-            }
-        });
+
+//        title_mic_button.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+//                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, new String[]{"hin-IND"});
+//                try{
+//                    startActivityForResult(intent,RESULT_TITLE_SPEECH);
+//                }catch (ActivityNotFoundException a){
+//                    Toast toast = Toast.makeText(getApplicationContext(),"Your device dosen't support speech recognisation!",Toast.LENGTH_SHORT);
+//                    toast.show();
+//                }
+//            }
+//        });
+//        description_mic_button.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent= new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+//                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,new String[]{"en"});
+//                try{
+//                    startActivityForResult(intent,RESULT_DESCRIPTION_TEXT);
+//                }catch (ActivityNotFoundException a){
+//                    Toast toast = Toast.makeText(getApplicationContext(),"Your device dosen't support speech recognisation!",Toast.LENGTH_SHORT);
+//                    toast.show();
+//                }
+//            }
+//        });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode){
-            case RESULT_TITLE_SPEECH:
-                if(resultCode==RESULT_OK&& data!=null){
-                    ArrayList<String> text = data
-                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    title_text_view.setText(text.get(0));
-                }
-                break;
-            case RESULT_DESCRIPTION_TEXT:
-                if(resultCode==RESULT_OK && data!=null){
-                    ArrayList<String> text= data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    description_text_view.setText(text.get(0));
-                }
-                 break;
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        switch(requestCode){
+//            case RESULT_TITLE_SPEECH:
+//                if(resultCode==RESULT_OK&& data!=null){
+//                    ArrayList<String> text = data
+//                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+//                    title_text_view.setText(text.get(0));
+//                }
+//                break;
+//            case RESULT_DESCRIPTION_TEXT:
+//                if(resultCode==RESULT_OK && data!=null){
+//                    ArrayList<String> text= data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+//                    description_text_view.setText(text.get(0));
+//                }
+//                 break;
+//        }
+//    }
+        //TEST!!!
+        @Override
+        protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+            super.onActivityResult(requestCode, resultCode, data);
+            switch(requestCode){
+                case RESULT_TITLE_SPEECH:
+                    if(resultCode==RESULT_OK&& data!=null){
+                        ArrayList<String> text = data
+                                .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                        weather_text_view.setText(text.get(0));
+                    }
+                    break;
+                case RESULT_DESCRIPTION_TEXT:
+                    if(resultCode==RESULT_OK && data!=null){
+                        ArrayList<String> text= data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                        description_text_view.setText(text.get(0));
+                    }
+                    break;
+            }
         }
-    }
-
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
@@ -287,7 +320,8 @@ private boolean has_filled_diary= false;
     private void saveDiary(Uri saveUri) {
         ContentValues values = new ContentValues();
 
-        String title= title_text_view.getText().toString();
+        String title= weather_text_view.getText().toString();
+        convertToEmoji();
         String date = date_text_view.getText().toString();
         String description = description_text_view.getText().toString();
         byte[] image_bytes;
@@ -379,7 +413,7 @@ private boolean has_filled_diary= false;
 
             String description = data.getString(data.getColumnIndex(DiaryEntry.COLUMN_DESCRIPTION));
             Log.v("DetailAvtivity", description);
-            title_text_view.setText(title);
+            weather_text_view.setText(title);
             date_text_view.setText(date);
             description_text_view.setText(description);
         }
@@ -398,5 +432,108 @@ private boolean has_filled_diary= false;
 
         date_text_view.setText(sdf.format(myCalendar.getTime()));
     }
+    StringBuilder sb = new StringBuilder("");
 
-}
+    public void openCSV() {
+
+        try {
+            InputStream in = this.getResources().openRawResource(R.raw.emojidata);
+
+            BufferedReader buffer = null;
+            if (in != null) {
+                InputStreamReader stream = new InputStreamReader(in, "utf-8");
+                buffer = new BufferedReader(stream);
+
+            }
+
+
+
+            String read;
+            while ((read = buffer.readLine()) != null) {
+                sb.append(read);
+            }
+            in.close();
+
+//            System.out.println("-----------------------------------");
+//            System.out.println(sb.toString());
+
+
+
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+//    public static final String[] emojiarr = new String[0];   //짝
+//    public static final String[] textarr = new String[0];    //홀
+
+    public void convertToEmoji() {
+        openCSV();
+
+        String text = weather_text_view.getText().toString();
+        System.out.println(text);
+        System.out.println(sb.toString());
+        String stringsb = sb.toString();
+        //ArrayList<String> text = data
+        String[] arr1 = stringsb.split(",");
+        int len = arr1.length;
+
+        String[] emojiarr = new String[len];   //짝
+        String[] textarr = new String[len];    //홀
+
+        System.out.println("array" + Arrays.toString(arr1));
+
+        int even = 0;
+        int odd = 0;
+
+        for (int i = 0; i < arr1.length; i++) {
+            if (i % 2 == 0) {
+                emojiarr[even] = arr1[i];
+                System.out.println("emoji1: " + emojiarr[i]);
+                System.out.println("emoji array" + Arrays.toString(emojiarr));
+                even++;
+            } else if (i % 2 != 0) {
+                textarr[odd] = arr1[i];
+                System.out.println("text: " + textarr[i]);
+                System.out.println("text array " + Arrays.toString(textarr));
+                odd++;
+            }
+        }
+
+//        ArrayList<String> arrayList = new ArrayList<>();
+//        for(String temp : arr1) {
+//            arrayList.add(temp);
+//        }
+//
+//        ArrayList<String> emojiarr = new ArrayList();
+//        ArrayList<String> textarr = new ArrayList();
+//
+//        System.out.println("emojidata array" + Arrays.toString(arr1));
+//        int even =0;
+//        int odd =0;
+//
+//        for(int i = 0; i< arrayList.size(); i++) {
+//            if(i%2 == 0 ) {
+//                emojiarr.add(arrayList.get(i));
+//                System.out.println("emoji: " + emojiarr.get(i));
+//                System.out.println(emojiarr);
+//                even++;
+//            }
+//
+//            else if(i%2 != 0 ) {
+//                textarr.add(arrayList.get(i));
+//                System.out.println("text: " + textarr.get(i));
+//                System.out.println(textarr);
+//                odd++;
+//            }
+//        }
+
+    }
+
+ }
+
+
+
